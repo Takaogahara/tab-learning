@@ -1,0 +1,61 @@
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+*.egg*
+dist/
+build/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# VSCode files
+.ideal/
+.vscode/
+*.code-workspace
+*.pyc
+
+# Pytest
+.pytest_cache/
+
+# User defined
+*.yaml
+!*example*.yaml
+
+*.csv
+!*example*.csv
+!*dummy*.csv
+
+*.txt
+!*requirements-base.txt
+!*requirements-cpu.txt
+!*requirements-gpu.txt
+!*requirements-dev.txt
+!*logo.txt
+*.log
+
+*temp*
+/mlruns
+/ray_results

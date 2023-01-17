@@ -1,0 +1,69 @@
+# Desired task:
+    # Classification
+    # Regression
+- TASK: "Regression"
+
+- RUN:
+    # Run name
+    RUN_NAME: "None"
+    # Number of Hyperparameter search samples
+    RUN_RAY_SAMPLES: 1
+    # Number of CPU cores per sample
+    RUN_RAY_CPU: 2
+    # Number of GPU cores per sample
+    RUN_RAY_GPU: 0
+    # Max train epoch
+    RUN_RAY_EPOCHS: 1
+
+- DATA:
+    # Train data path
+    DATA_TRAIN: "path/to/file.csv"
+    # Test data path
+    DATA_TEST: "path/to/file.csv"
+    # Dataframe ID column
+    DATA_COL_ID: "id"
+    # Dataframe target column
+    DATA_COL_TARGET: "target"
+
+- TABNET:
+    # Width of the decision prediction layer.
+    # Bigger values gives more capacity to the model with the risk of overfitting.
+        # Range: 8 to 64 (default=8)
+    TAB_N_D: 8
+    # Width of the attention embedding for each mask.
+        # Range: TAB_N_D=TAB_N_A is usually a good choice
+    TAB_N_A: 8
+    # Number of steps in the architecture
+        # Range: 3 to 10 (default=3)
+    TAB_N_STEPS: [3, 5]
+    # Feature reusage in masks.
+    # A value close to 1 will make mask selection least correlated between layers.
+        # Range: 1.0 to 2.0 (default=1.3)
+    TAB_GAMMA: [1.2, 1.6]
+    # Number of independent Gated Linear Units layers at each step.
+        # Range: 1 to 5 (default=2)
+    TAB_N_INDEPENDENT: 2
+    # Number of shared Gated Linear Units at each step.
+        # Range: 1 to 5 (default=2)
+    TAB_N_SHARED: [1, 2]
+    # Should be left untouched
+        # Range: 1e-15 (default=1e-15)
+    TAB_EPSILON: 1e-15
+    # Momentum for batch normalization.
+        # Range: 0.01 to 0.4 (default=0.02)
+    TAB_MOMENTUM: 0.02
+    # Extra sparsity loss coefficient.
+    # The bigger this coefficient is, the sparser your model will be in feature selection.
+    # Depending on the difficulty of your problem, reducing this value could help.
+        # default = 1e-3
+    TAB_LAMBDA_SPARSE: 1e-3
+    # List of embeddings size for each categorical features.
+        # default = 1
+    TAB_CAT_EMB_DIM: [1, 4]
+    # Number of examples per batch. Large batch sizes are recommended.
+        # default = 1024
+    TAB_BATCH_SIZE: 1024
+    # Loss function for training
+        # Regression default = MSELoss
+        # Classification default = CrossEntropyLoss 
+    TAB_LOSS_FN: ["MSE"]

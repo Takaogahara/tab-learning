@@ -1,0 +1,84 @@
+import ray
+import argparse
+from ray import tune, air
+from ray.tune.schedulers import AsyncHyperBandScheduler
+
+from utils import Utils
+from run import train
+
+
+def get_parse():
+    parser = argparse.ArgumentParser(description="Tabular Toolkit")
+    parser.add_argument("run", default="train",
+                        help="Run type. (train / test)")
+    parser.add_argument("--cfg", type=str, required=True,
+                        help="Configuration file path")
+    parser.add_argument("--train-test", required=False,
+                        default=False, help="Finish quickly for testing")
+
+    args, _ = parser.parse_known_args()
+
+    ray.init()
+
+    return args
+
+
+def trial_name(trial):
+    pre = (trial.local_dir).split('/')[-1]
+    pos = (trial.trial_id).split('_')[-1]
+    return f"{pre}_{pos}"
+
+
+def create_tuner(parameters, args):
+    num_samples = parameters["RUN_RAY_SAMPLES"]
+    max_epochs = parameters["RUN_RAY_EPOCHS"]
+    n_cpus = parameters["RUN_RAY_CPU"]
+    n_gpus = parameters["RUN_RAY_GPU"]
+
+    if args.train_test:
+        num_samples = 1
+        max_epochs = 2
+        parameters["RUN_RAY_EPOCHS"] = max_epochs
+    search_space = Utils.get_choices(parameters)
+
+    scheduler = AsyncHyperBandScheduler(max_t=max_epochs,
+                                        grace_period=1,
+                                        reduction_factor=2)
+
+    tuner = tune.Tuner(
+        tune.with_resources(train,
+                            resources={"cpu": n_cpus, "gpu": n_gpus}),
+        run_config=air.RunConfig(name=parameters["RUN_NAME"],
+                                 local_dir="./ray_results",
+                                 verbose=3),
+        tune_config=tune.TuneConfig(metric="_metric",
+                                    mode="min",
+                                    scheduler=scheduler,
+                                    num_samples=num_samples,
+                                    trial_name_creator=trial_name,
+                                    trial_dirname_creator=trial_name),
+        param_space=search_space)
+
+    return tuner
+
+
+if __name__ == "__main__":
+    # Get arg parse
+    args = get_parse()
+
+    # Load parameters from config file
+    parameters = Utils.load_configs(args.cfg)
+
+    if args.run.lower() == "train":
+        # Create Ray Tune instance
+        tuner = create_tuner(parameters, args)
+
+        # Run and get results
+        results = tuner.fit()
+        best_result = results.get_best_result("_metric", "min")
+
+        print(f"\nBest model: {best_result.log_dir}\n")
+
+    # TODO Implement
+    elif args.run.lower() == "test":
+        raise NotImplementedError
