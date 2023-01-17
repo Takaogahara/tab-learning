@@ -41,7 +41,6 @@ class Model:
                           "gamma": parameters["TAB_GAMMA"],
                           "n_independent": parameters["TAB_N_INDEPENDENT"],
                           "n_shared": parameters["TAB_N_SHARED"],
-                          "epsilon": parameters["TAB_EPSILON"],
                           "momentum": parameters["TAB_MOMENTUM"],
                           "lambda_sparse": parameters["TAB_LAMBDA_SPARSE"],
                           "cat_idxs": self.cat_idxs,
@@ -76,8 +75,6 @@ class Model:
 
         loss = model.history["loss"][model.best_epoch]
         self._export_model(model)
-
-        # TODO log model max epoch?
 
         return loss
 

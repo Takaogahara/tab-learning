@@ -33,12 +33,11 @@ def train(parameters):
     # Process data
     processor = Dataprocessor(parameters)
     train_transform, categoricals = processor.fit_transform(X_train, col_feat)
-    export_path = processor.export()
 
+    export_path = processor.export()
     parameters["DATA_OUTPUT"] = str(export_path)
 
-    # test_transform = processor.transform(X_test)
-    test_transform, _ = processor.fit_transform(X_test, col_feat)
+    test_transform = processor.transform(X_test)
 
     ##########
     constructor = Model(categoricals, parameters)
@@ -58,9 +57,9 @@ def test(parameters, model, export_path):
 
     # Process data
     processor = Dataprocessor(parameters)
-    # valid_transform = processor.transform(X_valid, load=export_path)
-    col_feat = list(X_valid.columns)
-    valid_transform, _ = processor.fit_transform(X_valid, col_feat)
+    valid_transform = processor.transform(X_valid, load=export_path)
+    # col_feat = list(X_valid.columns)
+    # valid_transform, _ = processor.fit_transform(X_valid, col_feat)
 
     ##########
     valid_transform = valid_transform.values

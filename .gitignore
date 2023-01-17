@@ -59,3 +59,4 @@ venv.bak/
 *temp*
 /mlruns
 /ray_results
+/output
