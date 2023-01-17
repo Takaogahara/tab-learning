@@ -46,9 +46,6 @@
     # Number of shared Gated Linear Units at each step.
         # Range: 1 to 5 (default=2)
     TAB_N_SHARED: [1, 2]
-    # Should be left untouched
-        # Range: 1e-15 (default=1e-15)
-    TAB_EPSILON: 1e-15
     # Momentum for batch normalization.
         # Range: 0.01 to 0.4 (default=0.02)
     TAB_MOMENTUM: 0.02
@@ -56,7 +53,7 @@
     # The bigger this coefficient is, the sparser your model will be in feature selection.
     # Depending on the difficulty of your problem, reducing this value could help.
         # default = 1e-3
-    TAB_LAMBDA_SPARSE: 1e-3
+    TAB_LAMBDA_SPARSE: [1e-3, 1e-5]
     # List of embeddings size for each categorical features.
         # default = 1
     TAB_CAT_EMB_DIM: [1, 4]

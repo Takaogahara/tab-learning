@@ -26,7 +26,6 @@ DEFAULT_PARAMS = {"TASK": "Regression",
                   "TAB_GAMMA": 1.3,
                   "TAB_N_INDEPENDENT": 2,
                   "TAB_N_SHARED": 2,
-                  "TAB_EPSILON": 0.000000000000001,
                   "TAB_MOMENTUM": 0.02,
                   "TAB_LAMBDA_SPARSE": 0.001,
                   "TAB_CAT_EMB_DIM": 1,
@@ -76,7 +75,6 @@ class Utils:
 
         return parameters
 
-    # TODO Remove CAT_EMB and EPSILON, LAMBDA_SPARSE from choice
     def get_choices(parameters: dict):
         choices = {}
 
