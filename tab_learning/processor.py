@@ -112,8 +112,7 @@ class Dataprocessor:
 
     def transform(self, data, load=None):
         if load is not None:
-            path = Path(load)
-            path = str(path / "dataprocessor.pkl")
+            path = str(load / "dataprocessor.pkl")
             with open(path, "rb") as f:
                 scal_dict = pickle.load(f)
         else:

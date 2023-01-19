@@ -1,11 +1,13 @@
 import os
 import torch
 import warnings
+import matplotlib
 from pathlib import Path
 from matplotlib import pyplot as plt
 
 from pytorch_tabnet.tab_model import TabNetRegressor, TabNetClassifier
 
+matplotlib.use("Agg")
 warnings.simplefilter("ignore", UserWarning)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -78,19 +80,6 @@ class Model:
 
         return loss
 
-    def explain_tabnet(self, data):
-
-        data = data.values
-        _, masks = self.model.explain(data)
-
-        fig, axs = plt.subplots(1, len(masks), figsize=(20, 20))
-        for i in range(len(masks)):
-            axs[i].imshow(masks[i][:25])
-            axs[i].set_title(f"Mask {i}")
-
-        plt.show()
-        plt.close()
-
     def _export_model(self, model):
 
         self.model = model
@@ -107,3 +96,37 @@ class Model:
             model.device_name = "cpu"
             model.save_model(model_path)
             model.device_name = model.device
+
+
+class TestModel:
+    def __init__(self, parameters):
+        self.parameters = parameters
+
+    def load_tabnet(self):
+        task = self.parameters["TASK"]
+        export_path = Path(self.parameters["DATA_OUTPUT"])
+        model_path = str(export_path / "model.zip")
+
+        if task.lower() == "regression":
+            model = TabNetRegressor()
+        elif task.lower() == "classification":
+            model = TabNetClassifier()
+
+        model.load_model(model_path)
+        return model
+
+
+def explain_tabnet(model, data, path):
+    root = path.parent.parent
+    model_name = path.parent.name
+    export = str(root / f"{model_name}.png")
+
+    _, masks = model.explain(data.values)
+
+    fig, axs = plt.subplots(1, len(masks), figsize=(20, 20))
+    for i in range(len(masks)):
+        axs[i].imshow(masks[i][:25])
+        axs[i].set_title(f"Mask {i}")
+
+    plt.savefig(export, bbox_inches="tight")
+    plt.close()

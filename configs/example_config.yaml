@@ -24,6 +24,8 @@
     DATA_COL_ID: "id"
     # Dataframe target column
     DATA_COL_TARGET: "target"
+    # Save TabNet explanation
+    DATA_SAVE_TABNET: True
 
 - TABNET:
     # Width of the decision prediction layer.
@@ -61,6 +63,6 @@
         # default = 1024
     TAB_BATCH_SIZE: 1024
     # Loss function for training
-        # Regression default = MSELoss
-        # Classification default = CrossEntropyLoss 
+        # Regression default = MSE
+        # Classification default = BCEloss 
     TAB_LOSS_FN: ["MSE"]
