@@ -33,78 +33,7 @@ DEFAULT_PARAMS = {"TASK": "Regression",
                   "TAB_LOSS_FN": "mse"}
 
 
-class Utils:
-    def load_file(path: str):
-
-        PATH = Path(path)
-        if PATH.suffix == ".csv":
-            data = pd.read_csv(str(PATH), sep=",")
-
-        elif PATH.suffix == ".pkl":
-            data = pd.read_pickle(str(PATH))
-
-        elif PATH.suffix == ".parquet":
-            data = pd.read_parquet(str(PATH))
-
-        else:
-            raise RuntimeError("File type not supported")
-
-        return data
-
-    def load_configs(yaml_path: str):
-
-        with open(yaml_path, "r") as f:
-            file = yaml.safe_load(f)
-
-        content = {"TASK": file[0]["TASK"]}
-        content_list = [file[1]["RUN"], file[2]["DATA"], file[3]["TABNET"]]
-
-        for cfg in content_list:
-            for key, value in cfg.items():
-                content[key] = value
-
-        # * Auto complete config file
-        parameters = copy.deepcopy(DEFAULT_PARAMS)
-        for key, value in list(content.items()):
-            parameters[key] = value
-
-        if parameters["RUN_NAME"].lower() == "none":
-            name = uuid.uuid4()
-            name = str(name).split("-")[0]
-            parameters["RUN_NAME"] = name
-
-        return parameters
-
-    def get_choices(parameters: dict):
-        choices = {}
-
-        for key, value in list(parameters.items()):
-            # General parameters
-            if ("TAB_" not in key):
-                choices[key] = value
-
-            # TabNet single choices
-            elif not isinstance(value, list):
-                choices[key] = tune.choice([value])
-
-            # TabNet int choices
-            elif isinstance(value[0], int):
-                choices[key] = tune.randint(value[0], value[1])
-
-            # TabNet float choices
-            elif isinstance(value[0], float):
-                choices[key] = tune.uniform(value[0], value[1])
-
-            # TabNet string and log choices
-            elif isinstance(value[0], str):
-                if "e-" in value[0].lower():
-                    value = [float(x) for x in value]
-                    choices[key] = tune.loguniform(value[0], value[1])
-                else:
-                    choices[key] = tune.choice(value)
-
-        return choices
-
+class IO:
     def export_yaml(parameters: dict):
         export_path = Path(os.getcwd())
         export_path = export_path / "output"
@@ -126,6 +55,20 @@ class Utils:
         with open(yaml_path, 'w') as file:
             yaml.dump(dict_file, file, default_flow_style=False)
 
+    def export_preds(idx, preds, parameters):
+        model_root = Path(parameters["DATA_OUTPUT"])
+        root = model_root.parent.parent
+        model_name = model_root.parent.name
+        out_path = str(root / f"{model_name}.csv")
+
+        df_submission = pd.DataFrame()
+        df_submission[parameters["DATA_COL_ID"]] = idx
+        df_submission[parameters["DATA_COL_TARGET"]] = preds
+
+        df_submission.to_csv(out_path, sep=",", index=False)
+
+
+class DataHandler:
     def split_data(data, parameters, train_size=0.8):
         TASK = parameters["TASK"]
         COL_ID = parameters["DATA_COL_ID"]
@@ -161,3 +104,99 @@ class Utils:
         test = (X_te, y_te)
 
         return train, test
+
+
+class ParametersHandler:
+    def load_configs(yaml_path: str):
+
+        with open(yaml_path, "r") as f:
+            file = yaml.safe_load(f)
+
+        content = {"TASK": file[0]["TASK"]}
+        content_list = [file[1]["RUN"], file[2]["DATA"], file[3]["TABNET"]]
+
+        for cfg in content_list:
+            for key, value in cfg.items():
+                content[key] = value
+
+        # * Auto complete config file
+        parameters = copy.deepcopy(DEFAULT_PARAMS)
+        for key, value in list(content.items()):
+            parameters[key] = value
+
+        if parameters["RUN_NAME"].lower() == "none":
+            name = uuid.uuid4()
+            name = str(name).split("-")[0]
+            parameters["RUN_NAME"] = name
+
+        return parameters
+
+    def get_ray_choices(parameters: dict):
+        choices = {}
+
+        for key, value in list(parameters.items()):
+            # General parameters
+            if ("TAB_" not in key):
+                choices[key] = value
+
+            else:
+                val_type = type(value)
+
+                if val_type != list:
+                    choice_fn = _get_single_choice(value)
+                    choices[key] = choice_fn
+
+                else:
+                    choice_fn = _get_list_choice(value)
+                    choices[key] = choice_fn
+
+        return choices
+
+    def test_parms(parameters):
+        params = {}
+
+        for key, value in list(parameters.items()):
+            # General parameters
+            if ("TAB_" not in key):
+                params[key] = value
+
+            if isinstance(value, str):
+                if "e-" in value.lower():
+                    value = float(value)
+
+            params[key] = value
+
+        return params
+
+
+def _get_single_choice(value):
+
+    # Check for log
+    if isinstance(value, str):
+        if "e-" in value.lower():
+            value = float(value)
+
+    choice_fn = tune.choice([value])
+
+    return choice_fn
+
+
+def _get_list_choice(value):
+
+    # TabNet int choices
+    if isinstance(value[0], int):
+        choice_fn = tune.randint(value[0], value[1])
+
+    # TabNet float choices
+    elif isinstance(value[0], float):
+        choice_fn = tune.uniform(value[0], value[1])
+
+    # TabNet string and log choices
+    elif isinstance(value[0], str):
+        if "e-" in value[0].lower():
+            value = [float(x) for x in value]
+            choice_fn = tune.loguniform(value[0], value[1])
+        else:
+            choice_fn = tune.choice(value)
+
+    return choice_fn

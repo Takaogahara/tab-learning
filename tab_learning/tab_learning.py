@@ -3,8 +3,8 @@ import argparse
 from ray import tune, air
 from ray.tune.schedulers import AsyncHyperBandScheduler
 
-from utils import Utils
-from run import train
+from utils import ParametersHandler
+from run import train, test
 
 
 def get_parse():
@@ -39,7 +39,7 @@ def create_tuner(parameters, args):
         num_samples = 1
         max_epochs = 2
         parameters["RUN_RAY_EPOCHS"] = max_epochs
-    search_space = Utils.get_choices(parameters)
+    search_space = ParametersHandler.get_ray_choices(parameters)
 
     scheduler = AsyncHyperBandScheduler(max_t=max_epochs,
                                         grace_period=1,
@@ -67,9 +67,10 @@ if __name__ == "__main__":
     args = get_parse()
 
     # Load parameters from config file
-    parameters = Utils.load_configs(args.cfg)
+    parameters = ParametersHandler.load_configs(args.cfg)
 
     if args.run.lower() == "train":
+        # https://www.kaggle.com/code/neilgibbons/tuning-tabnet-with-optuna/notebook
         # Create Ray Tune instance
         tuner = create_tuner(parameters, args)
 
@@ -84,6 +85,6 @@ if __name__ == "__main__":
         with open(txt_path, "w") as f:
             f.write(f"{best_result.log_dir.name}")
 
-    # TODO Implement
     elif args.run.lower() == "test":
-        raise NotImplementedError
+        _ = test(parameters)
+        print("Done")
