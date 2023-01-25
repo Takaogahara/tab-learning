@@ -1,6 +1,8 @@
 import ray
 import argparse
 from ray import tune, air
+from ray.tune.search import ConcurrencyLimiter
+from ray.tune.search.optuna import OptunaSearch
 from ray.tune.schedulers import AsyncHyperBandScheduler
 
 from utils import ParametersHandler
@@ -45,6 +47,9 @@ def create_tuner(parameters, args):
                                         grace_period=1,
                                         reduction_factor=2)
 
+    algo = OptunaSearch()
+    algo = ConcurrencyLimiter(algo, max_concurrent=4)
+
     tuner = tune.Tuner(
         tune.with_resources(train,
                             resources={"cpu": n_cpus, "gpu": n_gpus}),
@@ -53,6 +58,7 @@ def create_tuner(parameters, args):
                                  verbose=3),
         tune_config=tune.TuneConfig(metric="_metric",
                                     mode="min",
+                                    search_alg=algo,
                                     scheduler=scheduler,
                                     num_samples=num_samples,
                                     trial_name_creator=trial_name,
@@ -70,7 +76,6 @@ if __name__ == "__main__":
     parameters = ParametersHandler.load_configs(args.cfg)
 
     if args.run.lower() == "train":
-        # https://www.kaggle.com/code/neilgibbons/tuning-tabnet-with-optuna/notebook
         # Create Ray Tune instance
         tuner = create_tuner(parameters, args)
 

@@ -1,4 +1,5 @@
 matplotlib==3.6.2
+optuna==2.9.1
 pandas==1.5.2
 pytorch-tabnet==4.0
 pyyaml==6.0
