@@ -13,6 +13,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 LOSS_FN = {"bceloss": torch.nn.BCELoss(),
+           "crossentropy": torch.nn.CrossEntropyLoss(),
            "mse": torch.nn.MSELoss()}
 EVAL_METRIC = {"classification": "balanced_accuracy",
                "regression": "rmse"}

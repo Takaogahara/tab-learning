@@ -64,5 +64,5 @@
     TAB_BATCH_SIZE: 1024
     # Loss function for training
         # Regression default = MSE
-        # Classification default = BCEloss 
+        # Classification = CrossEntropy, BCEloss (default: CrossEntropy)
     TAB_LOSS_FN: ["MSE"]
