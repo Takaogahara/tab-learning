@@ -5,12 +5,6 @@
 
 Welcome to the Tabular Learning! This repository contains a variety of resources for tackling tabular data tasks using machine learning and deep learning techniques.
 
-## To-do
-- [ ] Create test module
-- [ ] Create explainable AI module
-- [ ] Optuna hyperparameters tuning
-- [ ] MLFlow metrics tracking
-
 ## Features of this package
 - [x] Load tabular datasets
 - [x] Tabular classification

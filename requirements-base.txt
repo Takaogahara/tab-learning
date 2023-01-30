@@ -1,3 +1,4 @@
+ks-metric==0.2.0
 matplotlib==3.6.2
 optuna==2.9.1
 pandas==1.5.2
@@ -5,4 +6,5 @@ pytorch-tabnet==4.0
 pyyaml==6.0
 ray[tune]==2.2.0
 scikit-learn==1.2.0
+seaborn==0.12.2
 sklearn-pandas==2.2.0

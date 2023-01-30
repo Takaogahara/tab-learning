@@ -56,7 +56,7 @@ def create_tuner(parameters, args):
         run_config=air.RunConfig(name=parameters["RUN_NAME"],
                                  local_dir="./ray_results",
                                  verbose=3),
-        tune_config=tune.TuneConfig(metric="_metric",
+        tune_config=tune.TuneConfig(metric="loss",
                                     mode="min",
                                     search_alg=algo,
                                     scheduler=scheduler,
@@ -81,14 +81,13 @@ if __name__ == "__main__":
 
         # Run and get results
         results = tuner.fit()
-        best_result = results.get_best_result("_metric", "min")
+        dataframe = results.get_dataframe()
 
-        print(f"\nBest model: {best_result.log_dir}\n")
-
+        # Save
+        best_result = results.get_best_result("loss", "min")
         export_path = best_result.log_dir.parent
-        txt_path = str(export_path / "best_model.txt")
-        with open(txt_path, "w") as f:
-            f.write(f"{best_result.log_dir.name}")
+        csv_path = str(export_path / "results.csv")
+        dataframe.to_csv(csv_path, sep=",", index=False)
 
     elif args.run.lower() == "test":
         _ = test(parameters)
