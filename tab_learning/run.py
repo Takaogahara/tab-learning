@@ -28,12 +28,12 @@ def train(parameters):
     test_transform = processor.transform(X_test)
 
     ##########
-    constructor = Model(categoricals, parameters)
-    loss = constructor.train((train_transform, y_train),
-                             (test_transform, y_test))
+    model = Model(categoricals, parameters)
+    loss_dict = model.train((train_transform, y_train),
+                            (test_transform, y_test))
 
     IO.export_yaml(parameters)
-    return loss
+    return loss_dict
 
 
 def test(parameters):

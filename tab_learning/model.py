@@ -5,6 +5,7 @@ import matplotlib
 from pathlib import Path
 from matplotlib import pyplot as plt
 
+from metrics import LogMetrics
 from pytorch_tabnet.tab_model import TabNetRegressor, TabNetClassifier
 
 matplotlib.use("Agg")
@@ -79,7 +80,11 @@ class Model:
         loss = model.history["loss"][model.best_epoch]
         self._export_model(model)
 
-        return loss
+        metric = LogMetrics(model, parameters)
+        metrics = metric.compute((X_train, y_train), (X_test, y_test))
+        metrics["loss"] = loss
+
+        return metrics
 
     def _export_model(self, model):
 
