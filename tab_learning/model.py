@@ -21,26 +21,26 @@ EVAL_METRIC = {"classification": "balanced_accuracy",
 
 
 class Model:
-    def __init__(self, categoricals, parameters):
+    def __init__(self, categorical, parameters):
         self.task = parameters["TASK"]
-        self.cat_idxs = categoricals[0]
-        self.cat_dims = categoricals[1]
+        self.cat_idxs = categorical[0]
+        self.cat_dims = categorical[1]
 
         self.parameters = parameters
 
     def train(self, train_data, test_data):
         X_train, y_train = train_data
-        X_train = X_train.values
+        X_train = (X_train.values).astype(float)
         y_train = y_train.values.reshape(-1, 1)
 
         X_test, y_test = test_data
-        X_test = X_test.values
+        X_test = (X_test.values).astype(float)
         y_test = y_test.values.reshape(-1, 1)
 
         parameters = self.parameters
 
-        tab_parameters = {"n_d": parameters["TAB_N_D"],
-                          "n_a": parameters["TAB_N_A"],
+        tab_parameters = {"n_d": parameters["TAB_LAYERS"],
+                          "n_a": parameters["TAB_LAYERS"],
                           "n_steps": parameters["TAB_N_STEPS"],
                           "gamma": parameters["TAB_GAMMA"],
                           "n_independent": parameters["TAB_N_INDEPENDENT"],
@@ -49,7 +49,6 @@ class Model:
                           "lambda_sparse": parameters["TAB_LAMBDA_SPARSE"],
                           "cat_idxs": self.cat_idxs,
                           "cat_dims": self.cat_dims,
-                          "cat_emb_dim": parameters["TAB_CAT_EMB_DIM"],
                           "verbose": 0,
                           "seed": 8,
                           "device_name": device}
@@ -60,8 +59,8 @@ class Model:
         if self.task.lower() == "regression":
             model = TabNetRegressor(**tab_parameters)
             model.fit(X_train, y_train,
-                      batch_size=parameters["TAB_BATCH_SIZE"],
-                      max_epochs=parameters["RUN_RAY_EPOCHS"],
+                      batch_size=parameters["DATA_BATCH_SIZE"],
+                      max_epochs=parameters["DATA_EPOCHS"],
                       loss_fn=loss_fn,
                       eval_set=[(X_test, y_test)],
                       eval_metric=[eval_metric], patience=10,
@@ -70,8 +69,8 @@ class Model:
         elif self.task.lower() == "classification":
             model = TabNetClassifier(**tab_parameters)
             model.fit(X_train, y_train.flatten(),
-                      batch_size=parameters["TAB_BATCH_SIZE"],
-                      max_epochs=parameters["RUN_RAY_EPOCHS"],
+                      batch_size=parameters["DATA_BATCH_SIZE"],
+                      max_epochs=parameters["DATA_EPOCHS"],
                       loss_fn=loss_fn,
                       eval_set=[(X_test, y_test.flatten())],
                       eval_metric=[eval_metric], patience=10,

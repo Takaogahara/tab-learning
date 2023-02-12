@@ -20,15 +20,14 @@ def train(parameters):
 
     # Process data
     processor = Dataprocessor(parameters)
-    train_transform, categoricals = processor.fit_transform(X_train, col_feat)
+    train_transform, cat, export = processor.fit_transform(X_train)
 
-    export_path = processor.export()
-    parameters["DATA_OUTPUT"] = str(export_path)
+    parameters["DATA_OUTPUT"] = str(export)
 
     test_transform = processor.transform(X_test)
 
     ##########
-    model = Model(categoricals, parameters)
+    model = Model(cat, parameters)
     loss_dict = model.train((train_transform, y_train),
                             (test_transform, y_test))
 
