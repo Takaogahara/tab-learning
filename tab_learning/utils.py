@@ -21,6 +21,7 @@ DEFAULT_PARAMS = {"TASK": "Regression",
                   "DATA_COL_ID": "id",
                   "DATA_COL_TARGET": "target",
 
+                  "TAB_CAT_ENCODER": "Default",
                   "TAB_LAYERS": 8,
                   "TAB_N_STEPS": 3,
                   "TAB_GAMMA": 1.3,
