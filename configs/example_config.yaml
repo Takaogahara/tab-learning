@@ -27,10 +27,15 @@
     # Max train epoch
     DATA_EPOCHS: 20
     # Number of examples per batch. Large batch sizes are recommended.
-    # default = 1024
+        # default = 1024
     DATA_BATCH_SIZE: 1024
 
 - TABNET:
+    # Encoder method for categorical values
+        # Default
+        # OneHot
+        # WoE -> Binary Classification only
+    TAB_CAT_ENCODER: "Default"
     # Width of the decision prediction layer and attention embedding for each mask.
     # Bigger values gives more capacity to the model with the risk of overfitting.
         # Range: 8 to 64 (default=8)
