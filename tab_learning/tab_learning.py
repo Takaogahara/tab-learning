@@ -33,14 +33,14 @@ def trial_name(trial):
 
 def create_tuner(parameters, args):
     num_samples = parameters["RUN_RAY_SAMPLES"]
-    max_epochs = parameters["RUN_RAY_EPOCHS"]
+    max_epochs = parameters["DATA_EPOCHS"]
     n_cpus = parameters["RUN_RAY_CPU"]
     n_gpus = parameters["RUN_RAY_GPU"]
 
     if args.train_test:
         num_samples = 1
         max_epochs = 2
-        parameters["RUN_RAY_EPOCHS"] = max_epochs
+        parameters["DATA_EPOCHS"] = max_epochs
     search_space = ParametersHandler.get_ray_choices(parameters)
 
     scheduler = AsyncHyperBandScheduler(max_t=max_epochs,

@@ -13,23 +13,21 @@ DEFAULT_PARAMS = {"TASK": "Regression",
                   "RUN_RAY_SAMPLES": 5,
                   "RUN_RAY_CPU": 2,
                   "RUN_RAY_GPU": 0.5,
-                  "RUN_RAY_EPOCHS": 2,
+                  "DATA_EPOCHS": 2,
+                  "DATA_BATCH_SIZE": 1024,
 
                   "DATA_TRAIN": "path/to/file.csv",
                   "DATA_TEST": "path/to/file.csv",
                   "DATA_COL_ID": "id",
                   "DATA_COL_TARGET": "target",
 
-                  "TAB_N_D": 8,
-                  "TAB_N_A": 8,
+                  "TAB_LAYERS": 8,
                   "TAB_N_STEPS": 3,
                   "TAB_GAMMA": 1.3,
                   "TAB_N_INDEPENDENT": 2,
                   "TAB_N_SHARED": 2,
                   "TAB_MOMENTUM": 0.02,
                   "TAB_LAMBDA_SPARSE": 0.001,
-                  "TAB_CAT_EMB_DIM": 1,
-                  "TAB_BATCH_SIZE": 1024,
                   "TAB_LOSS_FN": "mse"}
 
 
